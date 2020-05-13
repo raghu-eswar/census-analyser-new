@@ -37,7 +37,7 @@ public class OpenCSVBuilder<E> implements ICSVBuilder{
         }
     }
 
-    private CsvToBean<E> getCsvToBeanBuilder(Reader reader,Class csvClass) {
+    private CsvToBean<E> getCsvToBeanBuilder(Reader reader,Class<E> csvClass) {
         CsvToBeanBuilder<E> csvToBeanBuilder = new CsvToBeanBuilder<>(reader);
         csvToBeanBuilder.withType(csvClass);
         csvToBeanBuilder.withIgnoreLeadingWhiteSpace(true);
