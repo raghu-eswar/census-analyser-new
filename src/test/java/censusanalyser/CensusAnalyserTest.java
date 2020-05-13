@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Map;
+
 public class CensusAnalyserTest {
 
     private static final String INDIA_CENSUS_CSV_FILE_PATH = "./src/test/resources/IndiaStateCensusData.csv";
@@ -47,6 +49,17 @@ public class CensusAnalyserTest {
     }
 
     @Test
+    public void givenIndianCensusCSVFileReturnsMapWithCorrectRecords() {
+        try {
+            CensusAnalyser censusAnalyser = new CensusAnalyser();
+            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getIndianCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            Assert.assertEquals(29,indianCensusData.size());
+        } catch (CensusAnalyserException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     public void givenIndianStateCodeCSVFileReturnsCorrectRecords() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
@@ -78,6 +91,17 @@ public class CensusAnalyserTest {
             censusAnalyser.loadIndiaStateCodeData(WRONG_FIELDS_STATE_CODE_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.PROBLEM_IN_FIELDS,e.type);
+        }
+    }
+
+    @Test
+    public void givenIndianStateCodeCSVFileReturnsMapWithCorrectRecords() {
+        try {
+            CensusAnalyser censusAnalyser = new CensusAnalyser();
+            Map<String, IndiaStateCodeCSV> stateCodeData = censusAnalyser.getIndianStateCodeData(INDIA_STATE_CODE_CSV_FILE_PATH);
+            Assert.assertEquals(37,stateCodeData.size());
+        } catch (CensusAnalyserException e) {
+            e.printStackTrace();
         }
     }
 
