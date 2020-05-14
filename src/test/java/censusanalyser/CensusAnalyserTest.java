@@ -44,7 +44,18 @@ public class CensusAnalyserTest {
             exceptionRule.expect(CensusAnalyserException.class);
             censusAnalyser.loadIndiaCensusData(WRONG_FIELDS_CENSUS_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
-            Assert.assertEquals(CensusAnalyserException.ExceptionType.PROBLEM_IN_FIELDS,e.type);
+            Assert.assertEquals(CensusAnalyserException.ExceptionType.PROBLEM_IN_FIELDS, e.type);
+        }
+    }
+
+    @Test
+    public void withoutGivingIndianCensusCSVFile_getIndianCensusData_ShouldThrowException() {
+        try {
+            CensusAnalyser censusAnalyser = new CensusAnalyser();
+            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getIndianCensusData();
+            Assert.assertEquals(29,indianCensusData.size());
+        } catch (CensusAnalyserException e) {
+            Assert.assertEquals(CensusAnalyserException.ExceptionType.NO_CENSUS_DATA, e.type);
         }
     }
 
@@ -52,7 +63,8 @@ public class CensusAnalyserTest {
     public void givenIndianCensusCSVFileReturnsMapWithCorrectRecords() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
-            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getIndianCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getIndianCensusData();
             Assert.assertEquals(29,indianCensusData.size());
         } catch (CensusAnalyserException e) {
             e.printStackTrace();
@@ -63,7 +75,8 @@ public class CensusAnalyserTest {
     public void givenIndianCensusCSVFileReturnsSortedStateWiseSortedCensusData() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
-            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getStateWiseSortedCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getStateWiseSortedCensusData();
             IndiaCensusCSV[]sortedData = indianCensusData.values().toArray(new IndiaCensusCSV[0]);
             Assert.assertEquals("Andhra Pradesh",sortedData[0].getState());
             Assert.assertEquals("West Bengal",sortedData[sortedData.length-1].getState());
@@ -76,7 +89,8 @@ public class CensusAnalyserTest {
     public void givenIndianCensusCSVFileReturnsPopulationWiseSortedCensusData() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
-            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getPopulationWiseSortedCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getPopulationWiseSortedCensusData();
             IndiaCensusCSV[]sortedData = indianCensusData.values().toArray(new IndiaCensusCSV[0]);
             Assert.assertEquals("Sikkim",sortedData[0].getState());
             Assert.assertEquals("Uttar Pradesh",sortedData[sortedData.length-1].getState());
@@ -89,7 +103,8 @@ public class CensusAnalyserTest {
     public void givenIndianCensusCSVFileReturnsAreaWiseSortedCensusData() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
-            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getAreaWiseSortedCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getAreaWiseSortedCensusData();
             IndiaCensusCSV[]sortedData = indianCensusData.values().toArray(new IndiaCensusCSV[0]);
             Assert.assertEquals("Goa",sortedData[0].getState());
             Assert.assertEquals("Rajasthan",sortedData[sortedData.length-1].getState());
@@ -102,7 +117,8 @@ public class CensusAnalyserTest {
     public void givenIndianCensusCSVFileReturnsDensityWiseSortedCensusData() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
-            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getDensityWiseSortedCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            censusAnalyser.loadIndiaCensusData(INDIA_CENSUS_CSV_FILE_PATH);
+            Map<String, IndiaCensusCSV> indianCensusData = censusAnalyser.getDensityWiseSortedCensusData();
             IndiaCensusCSV[]sortedData = indianCensusData.values().toArray(new IndiaCensusCSV[0]);
             Assert.assertEquals("Arunachal Pradesh",sortedData[0].getState());
             Assert.assertEquals("Bihar",sortedData[sortedData.length-1].getState());

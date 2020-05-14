@@ -9,17 +9,15 @@ import java.util.stream.StreamSupport;
 
 public class CensusAnalyser {
 
+    Map<String,IndiaCensusCSV> censusCSVMap = null;
+
     public int loadIndiaCensusData(String csvFilePath) throws CensusAnalyserException {
-        try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
-            ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
-            Iterator<IndiaCensusCSV> csvIterator = csvBuilder.getCsvIterator(reader, IndiaCensusCSV.class);
-            return getCount(csvIterator);
-        } catch (IOException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
-        } catch (CSVBuilderException e) {
-            throw new CensusAnalyserException(e.getMessage(), e.type.name());
+        List<IndiaCensusCSV> censusCSVList = loadCSVDataToList(csvFilePath, IndiaCensusCSV.class);
+        censusCSVMap = new HashMap<>();
+        for (IndiaCensusCSV censusCSV : censusCSVList) {
+            censusCSVMap.put(censusCSV.getState(),censusCSV);
         }
+        return censusCSVList.size();
     }
 
     public int loadIndiaStateCodeData(String csvFilePath) throws CensusAnalyserException {
@@ -53,13 +51,9 @@ public class CensusAnalyser {
         }
     }
 
-    public Map<String, IndiaCensusCSV> getIndianCensusData(String csvFilePath) throws CensusAnalyserException {
-        List<IndiaCensusCSV> censusCSVList = loadCSVDataToList(csvFilePath, IndiaCensusCSV.class);
-        Map<String,IndiaCensusCSV> censusCSVMap = new HashMap<>();
-        for (IndiaCensusCSV censusCSV : censusCSVList) {
-            censusCSVMap.put(censusCSV.getState(),censusCSV);
-        }
-        return censusCSVMap;
+    public Map<String, IndiaCensusCSV> getIndianCensusData() throws CensusAnalyserException {
+        throwNoCensusDataException();
+        return this.censusCSVMap;
     }
 
     public Map<String, IndiaStateCodeCSV> getIndianStateCodeData(String csvFilePath) throws CensusAnalyserException {
@@ -71,28 +65,33 @@ public class CensusAnalyser {
         return stateCodeCSVMap;
     }
 
-    public Map<String, IndiaCensusCSV> getStateWiseSortedCensusData(String csvFilePath) throws CensusAnalyserException {
-        Map<String, IndiaCensusCSV> indiaCensusCSVMap = getIndianCensusData(csvFilePath);
+    public Map<String, IndiaCensusCSV> getStateWiseSortedCensusData() throws CensusAnalyserException {
+        throwNoCensusDataException();
         Comparator<IndiaCensusCSV> censusCSVComparator = Comparator.comparing(IndiaCensusCSV::getState);
-        return sort(indiaCensusCSVMap,censusCSVComparator);
+        return sort(censusCSVMap,censusCSVComparator);
     }
 
-    public Map<String, IndiaCensusCSV> getPopulationWiseSortedCensusData(String csvFilePath) throws CensusAnalyserException {
-        Map<String, IndiaCensusCSV> indiaCensusCSVMap = getIndianCensusData(csvFilePath);
+    public Map<String, IndiaCensusCSV> getPopulationWiseSortedCensusData() throws CensusAnalyserException {
+        throwNoCensusDataException();
         Comparator<IndiaCensusCSV> censusCSVComparator = Comparator.comparing(IndiaCensusCSV::getPopulation);
-        return sort(indiaCensusCSVMap,censusCSVComparator);
+        return sort(censusCSVMap,censusCSVComparator);
     }
 
-    public Map<String, IndiaCensusCSV> getAreaWiseSortedCensusData(String csvFilePath) throws CensusAnalyserException {
-        Map<String, IndiaCensusCSV> indiaCensusCSVMap = getIndianCensusData(csvFilePath);
+    public Map<String, IndiaCensusCSV> getAreaWiseSortedCensusData() throws CensusAnalyserException {
+        throwNoCensusDataException();
         Comparator<IndiaCensusCSV> censusCSVComparator = Comparator.comparing(IndiaCensusCSV::getAreaInSqKm);
-        return sort(indiaCensusCSVMap,censusCSVComparator);
+        return sort(censusCSVMap,censusCSVComparator);
     }
 
-    public Map<String, IndiaCensusCSV> getDensityWiseSortedCensusData(String csvFilePath) throws CensusAnalyserException {
-        Map<String, IndiaCensusCSV> indiaCensusCSVMap = getIndianCensusData(csvFilePath);
+    public Map<String, IndiaCensusCSV> getDensityWiseSortedCensusData() throws CensusAnalyserException {
+        throwNoCensusDataException();
         Comparator<IndiaCensusCSV> censusCSVComparator = Comparator.comparing(IndiaCensusCSV::getDensityPerSqKm);
-        return sort(indiaCensusCSVMap,censusCSVComparator);
+        return sort(censusCSVMap,censusCSVComparator);
+    }
+
+    private void throwNoCensusDataException() throws CensusAnalyserException {
+        if (censusCSVMap == null || censusCSVMap.size() == 0 )
+            throw new CensusAnalyserException("no census data loaded ",CensusAnalyserException.ExceptionType.NO_CENSUS_DATA);
     }
 
     public Map<String, IndiaStateCodeCSV> getStateWiseSortedStateCodeData(String csvFilePath) throws CensusAnalyserException {
