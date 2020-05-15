@@ -1,26 +1,26 @@
 package censusanalyser;
 
 public class IndiaCensusDTO {
-    private String state;
+    private String stateName;
     private String stateCode;
     private int population;
-    private int areaInSqKm;
-    private int densityPerSqKm;
+    private double totalArea;
+    private double populationDensity;
 
     public IndiaCensusDTO(IndiaCensusDAO indiaCensusDAO) {
-        this.state = indiaCensusDAO.getState();
+        this.stateName = indiaCensusDAO.getStateName();
         this.stateCode = indiaCensusDAO.getStateCode();
         this.population = indiaCensusDAO.getPopulation();
-        this.areaInSqKm = indiaCensusDAO.getAreaInSqKm();
-        this.densityPerSqKm = indiaCensusDAO.getDensityPerSqKm();
+        this.totalArea = indiaCensusDAO.getTotalArea();
+        this.populationDensity = indiaCensusDAO.getPopulationDensity();
     }
 
-    public String getState() {
-        return state;
+    public String getStateName() {
+        return stateName;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
     }
 
     public String getStateCode() {
@@ -39,30 +39,30 @@ public class IndiaCensusDTO {
         this.population = population;
     }
 
-    public int getAreaInSqKm() {
-        return areaInSqKm;
+    public double getTotalArea() {
+        return totalArea;
     }
 
-    public void setAreaInSqKm(int areaInSqKm) {
-        this.areaInSqKm = areaInSqKm;
+    public void setTotalArea(double totalArea) {
+        this.totalArea = totalArea;
     }
 
-    public int getDensityPerSqKm() {
-        return densityPerSqKm;
+    public double getPopulationDensity() {
+        return populationDensity;
     }
 
-    public void setDensityPerSqKm(int densityPerSqKm) {
-        this.densityPerSqKm = densityPerSqKm;
+    public void setPopulationDensity(double populationDensity) {
+        this.populationDensity = populationDensity;
     }
 
     @Override
     public String toString() {
         return "IndiaCensusDTO{" +
-                "state='" + state + '\'' +
+                "stateName='" + stateName + '\'' +
                 ", stateCode='" + stateCode + '\'' +
                 ", population=" + population +
-                ", areaInSqKm=" + areaInSqKm +
-                ", densityPerSqKm=" + densityPerSqKm +
+                ", totalArea=" + totalArea +
+                ", populationDensity=" + populationDensity +
                 '}';
     }
 }

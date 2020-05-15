@@ -5,25 +5,21 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.StreamSupport;
 
 public class CensusAnalyser {
 
-    Map<String, IndiaCensusDAO> censusDataMap;
-
+    Map<String, IndiaCensusDAO> indiaCensusDataMap;
     public CensusAnalyser() {
-        this.censusDataMap = new HashMap<>();
+        this.indiaCensusDataMap = new HashMap<>();
     }
 
-    public int loadIndiaCensusData(String censusCsvFilePath, String stateCodeCsvFilePath) throws CensusAnalyserException {
-        try (Reader stateCodeReader = Files.newBufferedReader(Paths.get(stateCodeCsvFilePath))) {
+    public int loadIndiaCensusData(String censusCsvFilePath) throws CensusAnalyserException {
+        try (Reader reader = Files.newBufferedReader(Paths.get(censusCsvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
-            Iterator<IndiaStateCodeCSV> stateCodeIterator = csvBuilder.getCsvIterator(stateCodeReader, IndiaStateCodeCSV.class);
-            while (stateCodeIterator.hasNext()) {
-                Reader censusReader = Files.newBufferedReader(Paths.get(censusCsvFilePath));
-                Iterator<IndiaCensusCSV> censusIterator = csvBuilder.getCsvIterator(censusReader, IndiaCensusCSV.class);
-                IndiaCensusDAO indiaCensusDAO = IndiaCensusDAO.getInstance(stateCodeIterator.next(), censusIterator);
-                if (indiaCensusDAO != null)  censusDataMap.put(indiaCensusDAO.getState(), indiaCensusDAO);
+            Iterator<IndiaCensusCSV> censusIterator = csvBuilder.getCsvIterator(reader, IndiaCensusCSV.class);
+            while (censusIterator.hasNext()) {
+                IndiaCensusDAO indiaCensusDAO = new IndiaCensusDAO(censusIterator.next());
+                indiaCensusDataMap.put(indiaCensusDAO.getStateName(), indiaCensusDAO);
             }
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
@@ -32,25 +28,26 @@ public class CensusAnalyser {
             throw new CensusAnalyserException(e.getMessage(), e.type.name());
         }
 
-        return this.censusDataMap.size();
+        return this.indiaCensusDataMap.size();
     }
 
     public int loadIndiaStateCodeData(String csvFilePath) throws CensusAnalyserException {
+        throwNoCensusDataException();
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
             Iterator<IndiaStateCodeCSV> csvIterator = csvBuilder.getCsvIterator(reader, IndiaStateCodeCSV.class);
-            return getCount(csvIterator);
+            while (csvIterator.hasNext()) {
+                IndiaStateCodeCSV stateCodeCSV = csvIterator.next();
+                IndiaCensusDAO censusDAO = indiaCensusDataMap.get(stateCodeCSV.getStateName());
+                if (censusDAO != null)  censusDAO.setStateCode(stateCodeCSV.getStateCode());
+            }
+            return indiaCensusDataMap.size();
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
                     CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM);
         } catch (CSVBuilderException e) {
             throw new CensusAnalyserException(e.getMessage(), e.type.name());
         }
-    }
-
-    private <E> int getCount(Iterator<E> csvIterator) {
-        Iterable<E> csvIterable = () -> csvIterator;
-        return (int) StreamSupport.stream(csvIterable.spliterator(), false).count();
     }
 
     private <T> List<T> loadCSVDataToList(String csvFilePath, Class<T> csvClass) throws CensusAnalyserException {
@@ -66,62 +63,62 @@ public class CensusAnalyser {
         }
     }
 
-    public Map<String, IndiaCensusDAO> getIndianCensusData() throws CensusAnalyserException {
+    public Map<String, IndiaCensusDTO> getIndianCensusData() throws CensusAnalyserException {
         throwNoCensusDataException();
-        return this.censusDataMap;
+        return getIndiaCensusDTO(this.indiaCensusDataMap);
     }
 
     public Map<String, IndiaStateCodeCSV> getIndianStateCodeData(String csvFilePath) throws CensusAnalyserException {
         List<IndiaStateCodeCSV> stateCodeCSVList = loadCSVDataToList(csvFilePath, IndiaStateCodeCSV.class);
         Map<String,IndiaStateCodeCSV> stateCodeCSVMap = new HashMap<>();
         for (IndiaStateCodeCSV censusCSV : stateCodeCSVList) {
-            stateCodeCSVMap.put(censusCSV.getState(),censusCSV);
+            stateCodeCSVMap.put(censusCSV.getStateName(),censusCSV);
         }
         return stateCodeCSVMap;
     }
 
     public Map<String, IndiaCensusDTO> getStateWiseSortedCensusData() throws CensusAnalyserException {
         throwNoCensusDataException();
-        Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getState);
-        return getCensusDTO(sort(censusDataMap,censusCSVComparator));
+        Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getStateName);
+        return getIndiaCensusDTO(sort(indiaCensusDataMap,censusCSVComparator));
     }
 
     public Map<String, IndiaCensusDTO> getPopulationWiseSortedCensusData() throws CensusAnalyserException {
         throwNoCensusDataException();
         Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getPopulation);
-        return getCensusDTO(sort(censusDataMap,censusCSVComparator));
+        return getIndiaCensusDTO(sort(indiaCensusDataMap,censusCSVComparator));
     }
 
     public Map<String, IndiaCensusDTO> getAreaWiseSortedCensusData() throws CensusAnalyserException {
         throwNoCensusDataException();
-        Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getAreaInSqKm);
-        return getCensusDTO(sort(censusDataMap,censusCSVComparator));
+        Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getTotalArea);
+        return getIndiaCensusDTO(sort(indiaCensusDataMap,censusCSVComparator));
     }
 
     public Map<String, IndiaCensusDTO> getDensityWiseSortedCensusData() throws CensusAnalyserException {
         throwNoCensusDataException();
-        Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getDensityPerSqKm);
-        return getCensusDTO(sort(censusDataMap,censusCSVComparator));
+        Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getPopulationDensity);
+        return getIndiaCensusDTO(sort(indiaCensusDataMap,censusCSVComparator));
     }
 
     public Map<String, IndiaCensusDTO> getStateCodeWiseSortedCensusData() throws CensusAnalyserException {
         throwNoCensusDataException();
         Comparator<IndiaCensusDAO> censusCSVComparator = Comparator.comparing(IndiaCensusDAO::getStateCode);
-        return getCensusDTO(sort(censusDataMap,censusCSVComparator));
+        return getIndiaCensusDTO(sort(indiaCensusDataMap,censusCSVComparator));
     }
 
     private void throwNoCensusDataException() throws CensusAnalyserException {
-        if (censusDataMap == null || censusDataMap.size() == 0 )
+        if (indiaCensusDataMap == null || indiaCensusDataMap.size() == 0 )
             throw new CensusAnalyserException("no census data loaded ",CensusAnalyserException.ExceptionType.NO_CENSUS_DATA);
     }
 
     public Map<String, IndiaStateCodeCSV> getStateWiseSortedStateCodeData(String csvFilePath) throws CensusAnalyserException {
         Map<String, IndiaStateCodeCSV> indiaStateCodeCSVMap = getIndianStateCodeData(csvFilePath);
-        Comparator<IndiaStateCodeCSV> censusCSVComparator = Comparator.comparing(IndiaStateCodeCSV::getState);
+        Comparator<IndiaStateCodeCSV> censusCSVComparator = Comparator.comparing(IndiaStateCodeCSV::getStateName);
         return sort(indiaStateCodeCSVMap,censusCSVComparator);
     }
 
-    private Map<String, IndiaCensusDTO> getCensusDTO(Map<String, IndiaCensusDAO> daoMap) {
+    private Map<String, IndiaCensusDTO> getIndiaCensusDTO(Map<String, IndiaCensusDAO> daoMap) {
         Map<String, IndiaCensusDTO> indiaCensusDTOMap = new LinkedHashMap<>();
         for (String key : daoMap.keySet()) {
             indiaCensusDTOMap.put(key, new IndiaCensusDTO(daoMap.get(key)));
