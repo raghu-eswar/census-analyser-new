@@ -1,28 +1,34 @@
 package censusanalyser;
 
-import com.opencsv.bean.CsvBindByName;
+public class StateCodeDTO {
 
-public class IndiaStateCodeCSV implements StateCodeCSV {
-
-    @CsvBindByName(column = "State Name", required = true)
     private String stateName;
-
-    @CsvBindByName(column = "StateCode", required = true)
     private String stateCode;
 
-    @Override
+    public StateCodeDTO(CensusDAO censusDAO) {
+        this.stateName = censusDAO.getStateName();
+        this.stateCode = censusDAO.getStateCode();
+    }
+
     public String getStateName() {
         return stateName;
     }
 
-    @Override
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
     public String getStateCode() {
         return stateCode;
     }
 
+    public void setStateCode(String stateCode) {
+        this.stateCode = stateCode;
+    }
+
     @Override
     public String toString() {
-        return "IndiaStateCodeCSV{" +
+        return "StateCodeDTO{" +
                 "stateName='" + stateName + '\'' +
                 ", stateCode='" + stateCode + '\'' +
                 '}';

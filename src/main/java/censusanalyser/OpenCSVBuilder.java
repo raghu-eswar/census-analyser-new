@@ -43,4 +43,5 @@ public class OpenCSVBuilder<E> implements ICSVBuilder{
         csvToBeanBuilder.withIgnoreLeadingWhiteSpace(true);
         return csvToBeanBuilder.build();
     }
+
 }

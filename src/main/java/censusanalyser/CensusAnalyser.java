@@ -62,61 +62,61 @@ public class CensusAnalyser {
         }
     }
 
-    private <T> List<T> loadCSVDataToList(String csvFilePath, Class<T> csvClass) throws CensusAnalyserException {
-        try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
-            ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
-            return csvBuilder.getCsvDataToList(reader, csvClass);
-
-        } catch (IOException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM);
-        } catch (CSVBuilderException e) {
-            throw new CensusAnalyserException(e.getMessage(), e.type.name());
-        }
+    private List<CensusDTO> loadCensusDataToList() throws CensusAnalyserException {
+        throwNoDataException();
+        return new ArrayList<>(buildCensusDTO(censusDataMap).values());
     }
 
     public Map<String, CensusDTO> getIndianCensusData() throws CensusAnalyserException {
-        throwNoCensusDataException();
+        throwNoDataException();
         return buildCensusDTO(this.censusDataMap);
     }
 
-    public Map<String, IndiaStateCodeCSV> getIndianStateCodeData(String csvFilePath) throws CensusAnalyserException {
-        List<IndiaStateCodeCSV> stateCodeCSVList = loadCSVDataToList(csvFilePath, IndiaStateCodeCSV.class);
-        Map<String,IndiaStateCodeCSV> stateCodeCSVMap = new HashMap<>();
-        for (IndiaStateCodeCSV censusCSV : stateCodeCSVList) {
-            stateCodeCSVMap.put(censusCSV.getStateName(),censusCSV);
-        }
-        return stateCodeCSVMap;
+    public Map<String, StateCodeDTO> getIndianStateCodeData() throws CensusAnalyserException {
+        throwNoDataException();
+        return buildStateCodeDTO(censusDataMap);
     }
 
     public Map<String, CensusDTO> getStateWiseSortedCensusData() throws CensusAnalyserException {
-        throwNoCensusDataException();
+        throwNoDataException();
         Comparator<CensusDAO> censusCSVComparator = Comparator.comparing(CensusDAO::getStateName);
         return buildCensusDTO(sort(censusDataMap,censusCSVComparator));
     }
 
     public Map<String, CensusDTO> getPopulationWiseSortedCensusData() throws CensusAnalyserException {
-        throwNoCensusDataException();
+        throwNoDataException();
         Comparator<CensusDAO> censusCSVComparator = Comparator.comparing(CensusDAO::getPopulation);
         return buildCensusDTO(sort(censusDataMap,censusCSVComparator));
     }
 
     public Map<String, CensusDTO> getAreaWiseSortedCensusData() throws CensusAnalyserException {
-        throwNoCensusDataException();
+        throwNoDataException();
         Comparator<CensusDAO> censusCSVComparator = Comparator.comparing(CensusDAO::getTotalArea);
         return buildCensusDTO(sort(censusDataMap,censusCSVComparator));
     }
 
     public Map<String, CensusDTO> getDensityWiseSortedCensusData() throws CensusAnalyserException {
-        throwNoCensusDataException();
+        throwNoDataException();
         Comparator<CensusDAO> censusCSVComparator = Comparator.comparing(CensusDAO::getPopulationDensity);
         return buildCensusDTO(sort(censusDataMap,censusCSVComparator));
     }
 
     public Map<String, CensusDTO> getStateCodeWiseSortedCensusData() throws CensusAnalyserException {
-        throwNoCensusDataException();
+        throwNoDataException();
         Comparator<CensusDAO> censusCSVComparator = Comparator.comparing(CensusDAO::getStateCode);
         return buildCensusDTO(sort(censusDataMap,censusCSVComparator));
+    }
+
+    public Map<String, StateCodeDTO> getStateWiseSortedStateCodeData() throws CensusAnalyserException {
+        throwNoDataException();
+        Comparator<CensusDAO> censusCSVComparator = Comparator.comparing(CensusDAO::getStateCode);
+        return buildStateCodeDTO(sort(censusDataMap,censusCSVComparator));
+    }
+
+
+    private void throwNoDataException() throws CensusAnalyserException {
+        throwNoCensusDataException();
+        throwNoStateCodeDataException();
     }
 
     private void throwNoCensusDataException() throws CensusAnalyserException {
@@ -124,10 +124,13 @@ public class CensusAnalyser {
             throw new CensusAnalyserException("no census data loaded ",CensusAnalyserException.ExceptionType.NO_CENSUS_DATA);
     }
 
-    public Map<String, IndiaStateCodeCSV> getStateWiseSortedStateCodeData(String csvFilePath) throws CensusAnalyserException {
-        Map<String, IndiaStateCodeCSV> indiaStateCodeCSVMap = getIndianStateCodeData(csvFilePath);
-        Comparator<IndiaStateCodeCSV> censusCSVComparator = Comparator.comparing(IndiaStateCodeCSV::getStateName);
-        return sort(indiaStateCodeCSVMap,censusCSVComparator);
+    private void throwNoStateCodeDataException() throws CensusAnalyserException {
+        boolean status = true;
+        for (CensusDAO censusDAO : censusDataMap.values()) {
+            if (censusDAO.getStateCode() != null) status = false;
+        }
+        if (status)
+            throw new CensusAnalyserException("no state code data loaded ",CensusAnalyserException.ExceptionType.NO_STATE_CODE_DATA);
     }
 
     private Map<String, CensusDTO> buildCensusDTO(Map<String, CensusDAO> daoMap) {
@@ -136,6 +139,14 @@ public class CensusAnalyser {
             censusDTOMap.put(key, new CensusDTO(daoMap.get(key)));
         }
         return censusDTOMap;
+    }
+
+    private Map<String, StateCodeDTO> buildStateCodeDTO(Map<String, CensusDAO> daoMap) {
+        Map<String, StateCodeDTO> stateCodeDTOMap = new LinkedHashMap<>();
+        for (String key : daoMap.keySet()) {
+            stateCodeDTOMap.put(key, new StateCodeDTO(daoMap.get(key)));
+        }
+        return stateCodeDTOMap;
     }
 
     private <K,V> Map<K,V> sort(Map<K,V> map, Comparator<V> comparator) {
