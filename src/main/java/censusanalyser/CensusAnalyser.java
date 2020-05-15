@@ -23,6 +23,11 @@ public class CensusAnalyser {
         return this.censusDataMap.size();
     }
 
+    public int loadIndiaStateCodeData(String csvFilePath) throws CensusAnalyserException {
+        loadStateCodeData(csvFilePath, IndiaStateCodeCSV.class);
+        return censusDataMap.size();
+    }
+
     private <T extends CensusCSV> void loadCensusData(String censusCsvFilePath, Class<T> csvClass) throws CensusAnalyserException {
         try (Reader reader = Files.newBufferedReader(Paths.get(censusCsvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
@@ -39,17 +44,16 @@ public class CensusAnalyser {
         }
     }
 
-    public int loadIndiaStateCodeData(String csvFilePath) throws CensusAnalyserException {
+    private  <T extends StateCodeCSV> void loadStateCodeData(String csvFilePath, Class<T> stateCodeClass) throws CensusAnalyserException {
         throwNoCensusDataException();
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
-            Iterator<IndiaStateCodeCSV> csvIterator = csvBuilder.getCsvIterator(reader, IndiaStateCodeCSV.class);
+            Iterator<T> csvIterator = csvBuilder.getCsvIterator(reader, stateCodeClass);
             while (csvIterator.hasNext()) {
-                IndiaStateCodeCSV stateCodeCSV = csvIterator.next();
+                T stateCodeCSV = csvIterator.next();
                 CensusDAO censusDAO = censusDataMap.get(stateCodeCSV.getStateName());
                 if (censusDAO != null)  censusDAO.setStateCode(stateCodeCSV.getStateCode());
             }
-            return censusDataMap.size();
         } catch (IOException e) {
             throw new CensusAnalyserException(e.getMessage(),
                     CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM);
