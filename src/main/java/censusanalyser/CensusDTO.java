@@ -1,18 +1,18 @@
 package censusanalyser;
 
-public class IndiaCensusDTO {
+public class CensusDTO {
     private String stateName;
     private String stateCode;
     private int population;
     private double totalArea;
     private double populationDensity;
 
-    public IndiaCensusDTO(IndiaCensusDAO indiaCensusDAO) {
-        this.stateName = indiaCensusDAO.getStateName();
-        this.stateCode = indiaCensusDAO.getStateCode();
-        this.population = indiaCensusDAO.getPopulation();
-        this.totalArea = indiaCensusDAO.getTotalArea();
-        this.populationDensity = indiaCensusDAO.getPopulationDensity();
+    public CensusDTO(CensusDAO censusDAO) {
+        this.stateName = censusDAO.getStateName();
+        this.stateCode = censusDAO.getStateCode();
+        this.population = censusDAO.getPopulation();
+        this.totalArea = censusDAO.getTotalArea();
+        this.populationDensity = censusDAO.getPopulationDensity();
     }
 
     public String getStateName() {
@@ -57,7 +57,7 @@ public class IndiaCensusDTO {
 
     @Override
     public String toString() {
-        return "IndiaCensusDTO{" +
+        return "CensusDTO{" +
                 "stateName='" + stateName + '\'' +
                 ", stateCode='" + stateCode + '\'' +
                 ", population=" + population +
