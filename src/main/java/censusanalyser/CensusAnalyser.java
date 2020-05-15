@@ -67,12 +67,12 @@ public class CensusAnalyser {
         return new ArrayList<>(buildCensusDTO(censusDataMap).values());
     }
 
-    public Map<String, CensusDTO> getIndianCensusData() throws CensusAnalyserException {
+    public Map<String, CensusDTO> getCensusData() throws CensusAnalyserException {
         throwNoDataException();
         return buildCensusDTO(this.censusDataMap);
     }
 
-    public Map<String, StateCodeDTO> getIndianStateCodeData() throws CensusAnalyserException {
+    public Map<String, StateCodeDTO> getStateCodeData() throws CensusAnalyserException {
         throwNoDataException();
         return buildStateCodeDTO(censusDataMap);
     }
