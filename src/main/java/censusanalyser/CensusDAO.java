@@ -7,20 +7,12 @@ public class CensusDAO {
     private double totalArea;
     private double populationDensity;
 
-    public CensusDAO(IndiaCensusCSV censusCSV) {
-        this.stateName = censusCSV.getStateName();
-        this.stateCode = censusCSV.getStateCode();
-        this.population = censusCSV.getPopulation();
-        this.totalArea = censusCSV.getTotalArea();
-        this.populationDensity = censusCSV.getPopulationDensity();
-    }
-
-    public CensusDAO(USCensusCSV usCensusCSV) {
-        this.stateName = usCensusCSV.getStateName();
-        this.stateCode = usCensusCSV.getStateCode();
-        this.population = usCensusCSV.getPopulation();
-        this.totalArea = usCensusCSV.getTotalArea();
-        this.populationDensity = usCensusCSV.getPopulationDensity();
+    public <T extends CensusCSV> CensusDAO(T censusCsv) {
+        this.stateName = censusCsv.getStateName();
+        this.stateCode = censusCsv.getStateCode();
+        this.population = censusCsv.getPopulation();
+        this.totalArea = censusCsv.getTotalArea();
+        this.populationDensity = censusCsv.getPopulationDensity();
     }
 
     public String getStateName() {

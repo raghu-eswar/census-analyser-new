@@ -15,4 +15,13 @@ public class IndiaStateCodeCSV {
     public String getStateCode() {
         return stateCode;
     }
+
+    @Override
+    public String toString() {
+        return "IndiaStateCodeCSV{" +
+                "stateName='" + stateName + '\'' +
+                ", stateCode='" + stateCode + '\'' +
+                '}';
+    }
+
 }

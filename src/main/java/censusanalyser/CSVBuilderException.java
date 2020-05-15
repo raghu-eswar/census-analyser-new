@@ -2,7 +2,7 @@ package censusanalyser;
 
 public class CSVBuilderException extends Exception {
     enum ExceptionType {
-        CSV_FILE_PROBLEM, UNABLE_TO_PARSE, PROBLEM_IN_FIELDS
+        CENSUS_FILE_PROBLEM, STATE_CODE_FILE_PROBLEM, UNABLE_TO_PARSE, PROBLEM_IN_FIELDS
     }
 
     ExceptionType type;
