@@ -1,49 +1,15 @@
 package censusanalyser;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class CensusAnalyser {
 
     Map<String, CensusDAO> censusDataMap;
-    public CensusAnalyser() {
-        //this.censusDataMap = new HashMap<>();
-    }
+    public CensusAnalyser() { }
 
-    public int loadIndiaCensusData(String censusCsvFilePath) throws CensusAnalyserException {
-        this.censusDataMap = new CensusDAOBuilder().loadCensusData(censusCsvFilePath, IndiaCensusCSV.class);
+    public int loadCensusData(String country, String ... censusCsvFilePath) throws CensusAnalyserException, IllegalAccessException, NoSuchFieldException {
+        this.censusDataMap = new CensusDAOBuilder().loadCensusData(country, censusCsvFilePath);
         return this.censusDataMap.size();
-    }
-
-    public int loadUSCensusData(String censusCsvFilePath) throws CensusAnalyserException {
-        this.censusDataMap = new CensusDAOBuilder().loadCensusData(censusCsvFilePath, USCensusCSV.class);
-        return this.censusDataMap.size();
-    }
-
-    public int loadIndiaStateCodeData(String csvFilePath) throws CensusAnalyserException {
-        loadStateCodeData(csvFilePath, IndiaStateCodeCSV.class);
-        return censusDataMap.size();
-    }
-
-    private  <T extends StateCodeCSV> void loadStateCodeData(String csvFilePath, Class<T> stateCodeClass) throws CensusAnalyserException {
-        throwNoCensusDataException();
-        try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
-            ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
-            Iterator<T> csvIterator = csvBuilder.getCsvIterator(reader, stateCodeClass);
-            while (csvIterator.hasNext()) {
-                T stateCodeCSV = csvIterator.next();
-                CensusDAO censusDAO = censusDataMap.get(stateCodeCSV.getStateName());
-                if (censusDAO != null)  censusDAO.setStateCode(stateCodeCSV.getStateCode());
-            }
-        } catch (IOException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM);
-        } catch (CSVBuilderException e) {
-            throw new CensusAnalyserException(e.getMessage(), e.type.name());
-        }
     }
 
     private List<CensusDTO> loadCensusDataToList() throws CensusAnalyserException {
