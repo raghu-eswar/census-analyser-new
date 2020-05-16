@@ -10,38 +10,22 @@ public class CensusAnalyser {
 
     Map<String, CensusDAO> censusDataMap;
     public CensusAnalyser() {
-        this.censusDataMap = new HashMap<>();
+        //this.censusDataMap = new HashMap<>();
     }
 
     public int loadIndiaCensusData(String censusCsvFilePath) throws CensusAnalyserException {
-        loadCensusData(censusCsvFilePath, IndiaCensusCSV.class);
+        this.censusDataMap = new CensusDAOBuilder().loadCensusData(censusCsvFilePath, IndiaCensusCSV.class);
         return this.censusDataMap.size();
     }
 
     public int loadUSCensusData(String censusCsvFilePath) throws CensusAnalyserException {
-        loadCensusData(censusCsvFilePath, USCensusCSV.class);
+        this.censusDataMap = new CensusDAOBuilder().loadCensusData(censusCsvFilePath, USCensusCSV.class);
         return this.censusDataMap.size();
     }
 
     public int loadIndiaStateCodeData(String csvFilePath) throws CensusAnalyserException {
         loadStateCodeData(csvFilePath, IndiaStateCodeCSV.class);
         return censusDataMap.size();
-    }
-
-    private <T extends CensusCSV> void loadCensusData(String censusCsvFilePath, Class<T> csvClass) throws CensusAnalyserException {
-        try (Reader reader = Files.newBufferedReader(Paths.get(censusCsvFilePath))) {
-            ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
-            Iterator<T> csvIterator = csvBuilder.getCsvIterator(reader, csvClass);
-            while (csvIterator.hasNext()) {
-                CensusDAO censusDAO = new CensusDAO(csvIterator.next());
-                censusDataMap.put(censusDAO.getStateName(), censusDAO);
-            }
-        } catch (IOException e) {
-            throw new CensusAnalyserException(e.getMessage(),
-                    CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM);
-        } catch (CSVBuilderException e) {
-            throw new CensusAnalyserException(e.getMessage(), e.type.name());
-        }
     }
 
     private  <T extends StateCodeCSV> void loadStateCodeData(String csvFilePath, Class<T> stateCodeClass) throws CensusAnalyserException {
