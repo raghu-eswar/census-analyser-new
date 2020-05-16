@@ -18,7 +18,6 @@ public class CensusAnalyserTest {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
             int numOfRecords = censusAnalyser.loadCensusData("INDIA",INDIA_CENSUS_CSV_FILE_PATH, INDIA_STATE_CODE_CSV_FILE_PATH);
-            Map<String, CensusDTO> censusData = censusAnalyser.getCensusData();
             Assert.assertEquals(29,numOfRecords);
         } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
@@ -194,9 +193,9 @@ public class CensusAnalyserTest {
     public void givenUSCensusCSVFileReturnsCorrectRecords() {
         try {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
-            int numOfRecords = censusAnalyser.loadCensusData("US", US_CENSUS_CSV_FILE_PATH);
+            censusAnalyser.loadCensusData("US", US_CENSUS_CSV_FILE_PATH);
             Map<String, CensusDTO> censusData = censusAnalyser.getCensusData();
-            Assert.assertEquals(51,numOfRecords);
+            Assert.assertEquals(51,censusData.size());
         } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
             e.printStackTrace();
         }

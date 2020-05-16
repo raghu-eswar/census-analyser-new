@@ -12,7 +12,7 @@ import java.util.Map;
 public class CensusDAOBuilder {
     Map<String, CensusDAO> censusDataMap = new HashMap<>();
 
-    enum FieldClassesList{
+    private enum FieldClassesList{
         stateCode(IndiaStateCodeCSV.class);
         private final Class _class;
         FieldClassesList(Class _class) {
@@ -20,7 +20,7 @@ public class CensusDAOBuilder {
         }
     }
 
-    public enum CountryCsvClasses {
+    private enum CountryCsvClasses {
         INDIA(IndiaCensusCSV.class), US(USCensusCSV.class);
         private final Class<? extends CensusCSV> _class;
         CountryCsvClasses(Class<? extends CensusCSV> _class) {
