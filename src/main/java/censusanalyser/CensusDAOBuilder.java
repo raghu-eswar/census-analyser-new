@@ -16,9 +16,10 @@ import static org.apache.commons.beanutils.PropertyUtils.setProperty;
 
 public class CensusDAOBuilder {
     Map<String, CensusDAO> censusDataMap = new HashMap<>();
+    private String country;
 
     private enum FieldClassesList {
-        stateCode(IndiaStateCodeCSV.class);
+        INDIA_stateCode(IndiaStateCodeCSV.class);
         private final Class _class;
         FieldClassesList(Class _class) {
             this._class = _class;
@@ -33,12 +34,15 @@ public class CensusDAOBuilder {
         }
     }
 
-    public Map<String, CensusDAO> loadCensusData(String country, String... censusCsvFilePath) throws CensusAnalyserException, IllegalAccessException {
+    public Map<String, CensusDAO> loadCensusData(String country, String... censusCsvFilePath) 
+                                                    throws CensusAnalyserException, IllegalAccessException {
         Class<? extends CensusCSV> countryClass = CountryCsvClasses.valueOf(country)._class;
+        this.country = country;
         return loadCensusData(countryClass,censusCsvFilePath);
     }
 
-    private <T extends CensusCSV> Map<String, CensusDAO> loadCensusData(Class<T> csvClass, String... censusCsvFilePath) throws CensusAnalyserException, IllegalAccessException {
+    private <T extends CensusCSV> Map<String, CensusDAO> loadCensusData(Class<T> csvClass, String... censusCsvFilePath) 
+                                                                            throws CensusAnalyserException, IllegalAccessException {
         try (Reader reader = Files.newBufferedReader(Paths.get(censusCsvFilePath[0]))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
             Iterator<T> csvIterator = csvBuilder.getCsvIterator(reader, csvClass);
@@ -92,7 +96,7 @@ public class CensusDAOBuilder {
     }
 
     private void loadEmptyFieldWithData(String fieldName, String path) throws CensusAnalyserException {
-        Class fieldClass = FieldClassesList.valueOf(fieldName)._class;
+        Class fieldClass = FieldClassesList.valueOf(country+"_"+fieldName)._class;
         loadEmptyFieldWithData(path, fieldClass,fieldName);
     }
 
@@ -122,14 +126,3 @@ public class CensusDAOBuilder {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
