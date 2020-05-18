@@ -62,7 +62,7 @@ public class CensusDAOBuilder {
         if (emptyField != null) {
             for (String path : censusCsvFilePath) {
                 try {
-                    loadEmptyFieldData(emptyField, path);
+                    loadEmptyFieldWithData(emptyField, path);
                     newEmptyField = getEmptyFields();
                     if (!emptyField.equals(newEmptyField)) {
                         break;
@@ -91,12 +91,12 @@ public class CensusDAOBuilder {
         return null;
     }
 
-    private void loadEmptyFieldData(String fieldName, String path) throws CensusAnalyserException {
+    private void loadEmptyFieldWithData(String fieldName, String path) throws CensusAnalyserException {
         Class fieldClass = FieldClassesList.valueOf(fieldName)._class;
-        loadEmptyFieldData(path, fieldClass,fieldName);
+        loadEmptyFieldWithData(path, fieldClass,fieldName);
     }
 
-    private  <T> void loadEmptyFieldData(String csvFilePath, Class<T> _class, String field) throws CensusAnalyserException {
+    private  <T> void loadEmptyFieldWithData(String csvFilePath, Class<T> _class, String field) throws CensusAnalyserException {
         try (Reader reader = Files.newBufferedReader(Paths.get(csvFilePath))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
             Iterator<T> csvIterator = csvBuilder.getCsvIterator(reader, _class);

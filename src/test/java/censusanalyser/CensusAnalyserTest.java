@@ -2,6 +2,8 @@ package censusanalyser;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 import java.util.Map;
 
 public class CensusAnalyserTest {
@@ -19,7 +21,7 @@ public class CensusAnalyserTest {
             CensusAnalyser censusAnalyser = new CensusAnalyser();
             int numOfRecords = censusAnalyser.loadCensusData("INDIA",INDIA_CENSUS_CSV_FILE_PATH, INDIA_STATE_CODE_CSV_FILE_PATH);
             Assert.assertEquals(29,numOfRecords);
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -31,7 +33,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("INDIA",WRONG_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM,e.type);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -43,7 +45,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("INDIA",WRONG_FIELDS_CENSUS_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.PROBLEM_IN_FIELDS, e.type);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -66,7 +68,7 @@ public class CensusAnalyserTest {
             censusAnalyser.getCensusData();
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.EMPTY_FIELDS, e.type);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -78,7 +80,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("INDIA",INDIA_CENSUS_CSV_FILE_PATH,INDIA_STATE_CODE_CSV_FILE_PATH);
             Map<String, CensusDTO> indianCensusData = censusAnalyser.getCensusData();
             Assert.assertEquals(29,indianCensusData.size());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -92,7 +94,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = indianCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Andhra Pradesh",sortedData[0].getStateName());
             Assert.assertEquals("West Bengal",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -106,7 +108,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = indianCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Sikkim",sortedData[0].getStateName());
             Assert.assertEquals("Uttar Pradesh",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -120,7 +122,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = indianCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Goa",sortedData[0].getStateName());
             Assert.assertEquals("Rajasthan",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -134,7 +136,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = indianCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Arunachal Pradesh",sortedData[0].getStateName());
             Assert.assertEquals("Bihar",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -148,7 +150,19 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = indianCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Andhra Pradesh",sortedData[0].getStateName());
             Assert.assertEquals("West Bengal",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void givenIndianCensusCSVFileReturnsJsonList() {
+        try {
+            CensusAnalyser censusAnalyser = new CensusAnalyser();
+            censusAnalyser.loadCensusData("INDIA",INDIA_CENSUS_CSV_FILE_PATH, INDIA_STATE_CODE_CSV_FILE_PATH);
+            List<String> jsonStrings = censusAnalyser.getCensusDataToJSONList();
+            Assert.assertEquals(29,jsonStrings.size());
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -160,7 +174,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("INDIA",INDIA_CENSUS_CSV_FILE_PATH, WRONG_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM,e.type);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -172,7 +186,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("INDIA",INDIA_CENSUS_CSV_FILE_PATH, WRONG_FIELDS_STATE_CODE_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.EMPTY_FIELDS,e.type);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -184,7 +198,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("INDIA",INDIA_CENSUS_CSV_FILE_PATH,INDIA_STATE_CODE_CSV_FILE_PATH);
             Map<String, StateCodeDTO> stateCodeData = censusAnalyser.getStateCodeData();
             Assert.assertEquals(29, stateCodeData.size());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -196,7 +210,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("US", US_CENSUS_CSV_FILE_PATH);
             Map<String, CensusDTO> censusData = censusAnalyser.getCensusData();
             Assert.assertEquals(51,censusData.size());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -208,7 +222,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("US",WRONG_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM,e.type);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -220,7 +234,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("US",WRONG_FIELDS_CENSUS_CSV_FILE_PATH);
         } catch (CensusAnalyserException e) {
             Assert.assertEquals(CensusAnalyserException.ExceptionType.PROBLEM_IN_FIELDS, e.type);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -242,7 +256,7 @@ public class CensusAnalyserTest {
             censusAnalyser.loadCensusData("US", US_CENSUS_CSV_FILE_PATH);
             Map<String, CensusDTO> usCensusData = censusAnalyser.getCensusData();
             Assert.assertEquals(51,usCensusData.size());
-        } catch (CensusAnalyserException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -256,7 +270,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = usCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Alabama",sortedData[0].getStateName());
             Assert.assertEquals("Wyoming",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -270,7 +284,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = usCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Wyoming",sortedData[0].getStateName());
             Assert.assertEquals("California",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -284,7 +298,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = usCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("District of Columbia",sortedData[0].getStateName());
             Assert.assertEquals("Alaska",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -298,7 +312,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = usCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Alaska",sortedData[0].getStateName());
             Assert.assertEquals("District of Columbia",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -312,7 +326,7 @@ public class CensusAnalyserTest {
             CensusDTO[]sortedData = usCensusData.values().toArray(new CensusDTO[0]);
             Assert.assertEquals("Alaska",sortedData[0].getStateName());
             Assert.assertEquals("Wyoming",sortedData[sortedData.length-1].getStateName());
-        } catch (CensusAnalyserException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (CensusAnalyserException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

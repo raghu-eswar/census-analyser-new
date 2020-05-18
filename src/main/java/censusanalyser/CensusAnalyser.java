@@ -1,5 +1,7 @@
 package censusanalyser;
 
+import com.google.gson.Gson;
+
 import java.util.*;
 
 public class CensusAnalyser {
@@ -7,14 +9,9 @@ public class CensusAnalyser {
     Map<String, CensusDAO> censusDataMap;
     public CensusAnalyser() { }
 
-    public int loadCensusData(String country, String ... censusCsvFilePath) throws CensusAnalyserException, IllegalAccessException, NoSuchFieldException {
+    public int loadCensusData(String country, String ... censusCsvFilePath) throws CensusAnalyserException, IllegalAccessException {
         this.censusDataMap = new CensusDAOBuilder().loadCensusData(country, censusCsvFilePath);
         return this.censusDataMap.size();
-    }
-
-    private List<CensusDTO> loadCensusDataToList() throws CensusAnalyserException {
-        throwNoDataException();
-        return new ArrayList<>(buildCensusDTO(censusDataMap).values());
     }
 
     public Map<String, CensusDTO> getCensusData() throws CensusAnalyserException {
@@ -63,6 +60,16 @@ public class CensusAnalyser {
         return buildStateCodeDTO(sort(censusDataMap,censusCSVComparator));
     }
 
+    public List<String> getCensusDataToJSONList() throws CensusAnalyserException {
+        throwNoDataException();
+        return toJSONList(buildCensusDTO(censusDataMap).values());
+    }
+
+    private List<String> toJSONList(Collection<CensusDTO> values) {
+        List<String> jsonList = new ArrayList<>();
+        values.forEach(censusDTO -> jsonList.add(new Gson().toJson(censusDTO)));
+        return jsonList;
+    }
 
     private void throwNoDataException() throws CensusAnalyserException {
         throwNoCensusDataException();
@@ -75,9 +82,12 @@ public class CensusAnalyser {
     }
 
     private void throwNoStateCodeDataException() throws CensusAnalyserException {
-        boolean status = true;
+        boolean status = false;
         for (CensusDAO censusDAO : censusDataMap.values()) {
-            if (censusDAO.getStateCode() != null) status = false;
+            if (censusDAO.getStateCode() == null) {
+                status = true;
+                break;
+            }
         }
         if (status)
             throw new CensusAnalyserException("no state code data loaded ",CensusAnalyserException.ExceptionType.NO_STATE_CODE_DATA);
