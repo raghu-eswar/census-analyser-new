@@ -38,14 +38,14 @@ public class CensusDAOBuilder {
         }
     }
 
-    public Map<String, CensusDAO> loadCensusData(String country, String... censusCsvFilePath) 
+    public Map<String, CensusDAO> loadCensusData(String country, String ... censusCsvFilePath)
                                                     throws CensusAnalyserException, IllegalAccessException {
         Class<? extends CensusCSV> countryClass = CountryCsvClasses.valueOf(country)._class;
         this.country = country;
         return loadCensusData(countryClass,censusCsvFilePath);
     }
 
-    private <T extends CensusCSV> Map<String, CensusDAO> loadCensusData(Class<T> csvClass, String... censusCsvFilePath) 
+    private <T extends CensusCSV> Map<String, CensusDAO> loadCensusData(Class<T> csvClass, String... censusCsvFilePath)
                                                                             throws CensusAnalyserException, IllegalAccessException {
         try (Reader reader = Files.newBufferedReader(Paths.get(censusCsvFilePath[0]))) {
             ICSVBuilder csvBuilder = CSVBuilderFactory.getCsvBuilder();
@@ -58,7 +58,7 @@ public class CensusDAOBuilder {
             throw new CensusAnalyserException(e.getMessage(),
                     CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM);
         } catch (CSVBuilderException e) {
-            throw new CensusAnalyserException(e.getMessage(), e.type.name());
+            throw new CensusAnalyserException(e.getMessage(), String.valueOf(e.type));
         }
         loadEmptyFields(censusCsvFilePath);
         return censusDataMap;
@@ -125,7 +125,7 @@ public class CensusDAOBuilder {
             throw new CensusAnalyserException(e.getMessage(),
                     CensusAnalyserException.ExceptionType.CSV_FILE_PROBLEM);
         } catch (CSVBuilderException e) {
-            throw new CensusAnalyserException(e.getMessage(), e.type.name());
+            throw new CensusAnalyserException(e.getMessage(), String.valueOf(e.type));
         }
     }
 

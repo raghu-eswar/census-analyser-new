@@ -5,7 +5,7 @@ public class CSVBuilderException extends Exception {
         CENSUS_FILE_PROBLEM, STATE_CODE_FILE_PROBLEM, UNABLE_TO_PARSE, PROBLEM_IN_FIELDS
     }
 
-    ExceptionType type;
+    public ExceptionType type;
 
     public CSVBuilderException(String message, ExceptionType type) {
         super(message);
