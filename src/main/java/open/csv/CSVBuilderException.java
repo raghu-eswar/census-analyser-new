@@ -1,4 +1,4 @@
-package censusanalyser;
+package open.csv;
 
 public class CSVBuilderException extends Exception {
     enum ExceptionType {

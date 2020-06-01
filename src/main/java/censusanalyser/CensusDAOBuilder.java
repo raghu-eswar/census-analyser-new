@@ -1,5 +1,9 @@
 package censusanalyser;
 
+import open.csv.CSVBuilderException;
+import open.csv.CSVBuilderFactory;
+import open.csv.ICSVBuilder;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Field;
